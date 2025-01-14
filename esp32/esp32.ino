@@ -8,6 +8,7 @@ int state = 0;
 int temp = 0;
 
 void setup() {
+  Serial.begin(9600);
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
   pinMode(TEMP_SENS, INPUT);
