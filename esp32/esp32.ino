@@ -22,14 +22,14 @@ void loop() {
   {
     case 1:
       if (greenLedStatus == LOW) {
-        greenLedStatus == HIGH;
-        redLedStatus == LOW;
+        greenLedStatus = HIGH;
+        redLedStatus = LOW;
       }
       break;
     case 2:
       if (redLedStatus == LOW) {
-        redLedStatus == HIGH;
-        greenLedStatus == LOW;
+        redLedStatus = HIGH;
+        greenLedStatus = LOW;
       }
       break;
     
@@ -37,6 +37,8 @@ void loop() {
       break;
   }
 
+  digitalWrite(GREEN_LED, greenLedStatus);
+  digitalWrite(RED_LED, redLedStatus);
   Serial.println(temp);
   delay(200);
 }
