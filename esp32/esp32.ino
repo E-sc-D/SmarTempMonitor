@@ -5,7 +5,11 @@
 int greenLedStatus = LOW;
 int redLedStatus = LOW;
 int state = 0;
-int temp = 0;
+float temp = 0.0;
+
+const int TMP36_PIN = 4; // Analog pin connected to TMP36
+const float VOLTAGE_REF = 3.3; // ESP32 reference voltage
+const int ADC_RESOLUTION = 4095; // 12-bit ADC resolution
 
 void setup() {
   Serial.begin(9600);
@@ -17,7 +21,8 @@ void setup() {
 }
 
 void loop() {
-  temp = (int)((analogRead(TEMP_SENS) * 0.00488 ) / 0.01);
+temp = ((analogRead(TMP36_PIN) / (float)ADC_RESOLUTION) * VOLTAGE_REF - 0.5) * 100.0;
+
 
   switch (state)
   {
