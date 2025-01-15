@@ -1,0 +1,35 @@
+# Byte-compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+*.egg-info/
+
+# Flask instance and config files
+instance/
+*.cfg
+*.env
+
+# IDE/Editor-specific files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+logs/
+
+# Cache and temporary files
+*.cache
+*.bak
+*.tmp
+
+
+
+# Compiled CSS/JS (e.g., from SCSS or TypeScript)
+*.css.map
+*.js.map
