@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for("static", filename="styles.css")}}">
+    <title>Temp Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div>
+
+    </div>
+    <div class="indicators">
+        <div class="chart-wrapper">
+            <!-- Top labels -->
+            <div class="top-labels">
+              <div>Max</div>
+              <div>Min</div>
+              <div>Avg</div>
+              <div>Value</div>
+            </div>
+        
+            <!-- Bar indicators -->
+            <ul class="vertical-bars">
+              <li style="height: 70%;"></li>
+              <li style="height: 50%;"></li>
+              <li style="height: 60%;"></li>
+              <li style="height: 90%;"></li>
+            </ul>
+        
+            <!-- Bottom labels -->
+            <div class="bottom-labels">
+              <div>70</div>
+              <div>50</div>
+              <div>60</div>
+              <div>90</div>
+            </div>
+        </div>
+        <div class="circle-container">
+            <div class="circle">
+              <!-- Input field inside the circle -->
+              <input type="number" id="percentageInput" value="60" max="100" min="0" />
+              <!-- Button inside the circle -->
+              <button onclick="updatePercentage()">Update</button>
+            </div>
+        </div>
+        <div class="subsection">
+            <button onclick="resetIndicator()">Reset</button>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

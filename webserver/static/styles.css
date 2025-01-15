@@ -1,0 +1,166 @@
+body {
+  background-color: wheat;
+}
+
+body > div:first-child {
+  background-color: lightgray;
+  margin: 50px 20%;
+  height: 400px;
+  border-radius: 10px;
+}
+
+body > div:nth-child(2) {
+  background-color: lightgray;
+  margin: 50px 20%;
+  height: 200px;
+  border-radius: 10px;
+}
+
+.indicators {
+  display: flex;
+}
+
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 250px; /* Set width of the entire chart */
+  margin: 0 auto;
+}
+
+/* Top label container */
+.top-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 5px; /* Space between labels and bars */
+}
+
+/* Bottom label container */
+.bottom-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 5px; /* Space between labels and bars */
+}
+
+/* Container for the bars */
+.vertical-bars {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* Align bars at the bottom */
+  height: 150px; /* Container height */
+  width: 100%;
+  background-color: transparent; /* Optional background color */
+}
+
+/* Individual bar styles */
+.vertical-bars li {
+  width: 30px; /* Bar width */
+  background-color: lightgray; /* Default bar color */
+  transition: height 0.3s ease-in-out; /* Smooth animation */
+  position: relative; /* Allows text positioning */
+}
+
+/* Color each bar */
+.vertical-bars li:nth-child(1) {
+  background-color: red;
+}
+
+.vertical-bars li:nth-child(2) {
+  background-color: green;
+}
+
+.vertical-bars li:nth-child(3) {
+  background-color: blue;
+}
+
+.vertical-bars li:nth-child(4) {
+  background-color: orange;
+}
+
+/* Style for the top text labels */
+.top-labels div,
+.bottom-labels div {
+  width: 30px;
+  text-align: center;
+  font-size: 12px; /* Adjust font size */
+}
+
+.circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+/* Circle styles with dynamic border */
+.circle {
+  width: 120px; /* Circle diameter */
+  height: 120px; /* Circle diameter */
+  border-radius: 50%; /* Make it a circle */
+  justify-content: center;
+  align-items: center;
+  font-size: 18px; /* Font size for the percentage text */
+  color: black; /* Text color */
+  position: relative;
+  background: conic-gradient(#2d8ff9 0% 60%, lightgray 60% 100%); /* Initial background gradient */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styles for the input field inside the circle */
+.circle input {
+  width: 60%; /* Adjust the width of the input */
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* Button inside the circle */
+.circle button {
+  margin-top: 10px; /* Space between input and button */
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #2d8ff9;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Button hover effect */
+.circle button:hover {
+  background-color: #1a6c9e;
+}
+
+.subsection {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin: auto;
+  height: 80%;
+  width: 20%;
+}
+
+/* Single button in the subsection */
+.subsection button {
+  height: 100%;
+  border: none;
+  border-radius: 5px;
+  background-color: #ff5722;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Hover effect for the subsection button */
+.subsection button:hover {
+  background-color: #e64a19;
+}/*# sourceMappingURL=styles.css.map */
