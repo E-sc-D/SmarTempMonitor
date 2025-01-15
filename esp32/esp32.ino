@@ -45,15 +45,16 @@ void loop() {
   switch (state)
   {
     case WIFI_NOT_CONNECTED:
-      while (WiFi.status() != WL_CONNECTED) {
+      if (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.println("Connecting to WiFi...");
+      } else {
+        Serial.println("Connected to WiFi");
+        state = MQTT_NOT_CONNECTED;
       }
-      Serial.println("Connected to WiFi");
-      state = MQTT_NOT_CONNECTED;
       break;
     case MQTT_NOT_CONNECTED:
-      while (!client.connected()) {
+      if (!client.connected()) {
         Serial.println("Connecting to MQTT...");
         if (client.connect("ESP32Client")) {
           Serial.println("Connected to MQTT broker");
