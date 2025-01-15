@@ -5,7 +5,7 @@ __pycache__/
 
 # Virtual environment
 venv/
-webserver/env
+env/
 *.egg-info/
 
 # Flask instance and config files
