@@ -17,7 +17,7 @@ const char* ssid = "ESP";
 const char* password = "pippo123";
 
 // MQTT info
-const char* mqttServer = "broker.hivemq.com";
+const char* mqttServer = "192.168.141.58";
 const int mqttPort = 1883;
 
 int greenLedStatus = LOW;
@@ -33,6 +33,8 @@ void setup() {
 
   WiFi.begin(ssid, password);
   client.setServer(mqttServer, mqttPort);
+  // Subscribe to a topic
+  client.subscribe("esp32/temperature");
 
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
@@ -80,7 +82,7 @@ void loop() {
         state = MQTT_NOT_CONNECTED;
       }
 
-      client.publish("Temperature", temp);
+      client.publish("esp32/temperature", temp);
       break;
     
     default:
