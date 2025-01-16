@@ -17,7 +17,7 @@ const char* ssid = "ESP";
 const char* password = "pippo123";
 
 // MQTT info
-const char* mqttServer = "broker.hivemq.com";
+const char* mqttServer = "192.168.141.58";
 const int mqttPort = 1883;
 
 int greenLedStatus = LOW;
@@ -33,6 +33,8 @@ void setup() {
 
   WiFi.begin(ssid, password);
   client.setServer(mqttServer, mqttPort);
+  // Subscribe to a topic
+  client.subscribe("esp32/temperature");
 
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
@@ -45,15 +47,16 @@ void loop() {
   switch (state)
   {
     case WIFI_NOT_CONNECTED:
-      while (WiFi.status() != WL_CONNECTED) {
+      if (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.println("Connecting to WiFi...");
+      } else {
+        Serial.println("Connected to WiFi");
+        state = MQTT_NOT_CONNECTED;
       }
-      Serial.println("Connected to WiFi");
-      state = MQTT_NOT_CONNECTED;
       break;
     case MQTT_NOT_CONNECTED:
-      while (!client.connected()) {
+      if (!client.connected()) {
         Serial.println("Connecting to MQTT...");
         if (client.connect("ESP32Client")) {
           Serial.println("Connected to MQTT broker");
@@ -79,7 +82,7 @@ void loop() {
         state = MQTT_NOT_CONNECTED;
       }
 
-      client.publish("Temperature", temp);
+      client.publish("esp32/temperature", temp);
       break;
     
     default:
