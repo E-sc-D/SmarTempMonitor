@@ -13,11 +13,11 @@ const float VOLTAGE_REF = 3.3; // ESP32 reference voltage
 const int ADC_RESOLUTION = 4095; // 12-bit ADC resolution
 
 // WiFi credentials
-const char* ssid = "DESKTOP-NKH2OLQ 8727";
-const char* password = "t716E61[";
+const char* ssid = "Vodafone-A88608562";
+const char* password = "6h7waw6tllpabakv";
 
 // MQTT info
-const char* mqttServer = "192.168.137.1";
+const char* mqttServer = "192.168.1.5";
 const int mqttPort = 1883;
 
 int greenLedStatus = LOW;
@@ -84,6 +84,7 @@ void loop() {
       }
       dtostrf(temp, 3, 2, tempS);
       client.publish("esp32/temperature", tempS);
+      delay(500);
       break;
     
     default:
@@ -92,5 +93,4 @@ void loop() {
 
   digitalWrite(GREEN_LED, greenLedStatus);
   digitalWrite(RED_LED, redLedStatus);
-  //Serial.println(temp);
 }
