@@ -11,16 +11,16 @@
 </head>
 <body>
     <div>
-        
+      <canvas id="temperatureChart" ></canvas>
     </div>
     <div class="indicators">
         <div class="chart-wrapper">
             <!-- Top labels -->
             <div class="top-labels">
-              <div>Max</div>
-              <div>Min</div>
-              <div>Avg</div>
-              <div>Value</div>
+              <p >Max</p>
+              <p >Min</p>
+              <p >Avg</p>
+              <p >Value</p>
             </div>
         
             <!-- Bar indicators -->
@@ -33,10 +33,10 @@
         
             <!-- Bottom labels -->
             <div class="bottom-labels">
-              <div>70</div>
-              <div>50</div>
-              <div>60</div>
-              <div>90</div>
+              <p id="max">Max</p>
+              <p id="min">Min</p>
+              <p id="avg">Avg</p>
+              <p id="value">Value</p>
             </div>
         </div>
         <div class="circle-container">
@@ -44,7 +44,7 @@
               <!-- Input field inside the circle -->
               <input type="number" id="percentageInput" value="60" max="100" min="0" />
               <!-- Button inside the circle -->
-              <button onclick="updatePercentage()">Update</button>
+              <button onclick="updatePercentage()">Auto</button>
             </div>
         </div>
         <div class="subsection">

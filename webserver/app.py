@@ -1,4 +1,6 @@
+import time
 import eventlet
+import random
 eventlet.monkey_patch()
 
 from flask import Flask, render_template
@@ -32,31 +34,26 @@ def on_message(client, userdata, msg):
     print(f"Message received: {msg.topic} -> {msg.payload.decode()}")
 
 
+
 @app.route("/")
 def index():
    return render_template("index.html")
 
-@socketio.on("connect")
-def IOon_connect():
+@socketio.on("connect") 
+def on_connect():
     print("Client connected")
-    emit("server_message", {"message": "Welcome to the server!"})
 
-# Handle messages from the client
-@socketio.on("client_message")
-def handle_client_message(data):
-    print(f"Received from client: {data['message']}")
-    # Respond back to the same client
-    emit("server_message", {"message": f"Server received: {data['message']}"})
+@socketio.on("disconnect")
+def handle_disconnect():
+    socketio.s
 
-# Server-side initiated messages
-def background_updates():
+def background_task():
     while True:
-        socketio.emit("server_message", {"message": "Periodic update from server"})
+        socketio.emit("temp_reading", {"temp": random.randint(10, 100)})
         time.sleep(5)
 
 
-
 if __name__ in "__main__":
+    socketio.start_background_task(background_task)
     socketio.run(app, debug=True)
 
-socketio.emit("server_response", {"message": "Periodic update from server"})
