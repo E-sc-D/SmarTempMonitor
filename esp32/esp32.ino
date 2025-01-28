@@ -13,17 +13,18 @@ const float VOLTAGE_REF = 3.3; // ESP32 reference voltage
 const int ADC_RESOLUTION = 4095; // 12-bit ADC resolution
 
 // WiFi credentials
-const char* ssid = "ESP";
-const char* password = "pippo123";
+const char* ssid = "DESKTOP-NKH2OLQ 8727";
+const char* password = "t716E61[";
 
 // MQTT info
-const char* mqttServer = "192.168.141.58";
+const char* mqttServer = "192.168.137.1";
 const int mqttPort = 1883;
 
 int greenLedStatus = LOW;
 int redLedStatus = LOW;
 int state = WIFI_NOT_CONNECTED;
 float temp = 0.0;
+char tempS[5];
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -41,7 +42,6 @@ void setup() {
 }
 
 void loop() {
-  client.loop();
   temp = ((analogRead(TEMP_SENS) / (float)ADC_RESOLUTION) * VOLTAGE_REF - 0.5) * 100.0;
 
   switch (state)
@@ -73,6 +73,7 @@ void loop() {
       }
       break;
     case OPERATING:
+      client.loop();
       if (greenLedStatus == LOW) {
         greenLedStatus = HIGH;
         redLedStatus = LOW;
@@ -81,8 +82,8 @@ void loop() {
       if (!client.connected()) {
         state = MQTT_NOT_CONNECTED;
       }
-
-      client.publish("esp32/temperature", temp);
+      dtostrf(temp, 3, 2, tempS);
+      client.publish("esp32/temperature", tempS);
       break;
     
     default:
@@ -91,5 +92,5 @@ void loop() {
 
   digitalWrite(GREEN_LED, greenLedStatus);
   digitalWrite(RED_LED, redLedStatus);
-  Serial.println(temp);
+  //Serial.println(temp);
 }
