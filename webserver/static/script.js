@@ -1,15 +1,40 @@
+let socket; 
+let value;
+let avg ;
+let max ;
+let min ;
+let tempLimit; 
+let valueBar ;
+let avgBar; 
+let maxBar ;
+let minBar ;
+let circleToggle; 
+let circleIndicator; 
+let circleInput ;
+
+
 document.addEventListener("DOMContentLoaded", () => {
     // Connect to the server using Socket.IO
-    const socket = io();
-    const value = document.getElementById("value");
-    const avg = document.getElementById("avg");
-    const max = document.getElementById("max");
-    const min = document.getElementById("min");
-    const tempLimit = 100;
-    const valueBar = document.querySelector(".vertical-bars li:nth-child(4)");
-    const avgBar = document.querySelector(".vertical-bars li:nth-child(3)");
-    const maxBar = document.querySelector(".vertical-bars li:nth-child(1)");
-    const minBar = document.querySelector(".vertical-bars li:nth-child(2)");
+    socket = io();
+    value = document.getElementById("value");
+    avg = document.getElementById("avg");
+    max = document.getElementById("max");
+    min = document.getElementById("min");
+    tempLimit = 100;
+    valueBar = document.querySelector(".vertical-bars li:nth-child(4)");
+    avgBar = document.querySelector(".vertical-bars li:nth-child(3)");
+    maxBar = document.querySelector(".vertical-bars li:nth-child(1)");
+    minBar = document.querySelector(".vertical-bars li:nth-child(2)");
+    circleToggle = document.querySelector(".circle button");
+    circleIndicator = document.querySelector(".circle");
+    circleInput = document.querySelector(".circle input");
+
+    circleInput.addEventListener("change", function (event) {
+            socket.emit("client_data", {"window": event.target.value});
+            circleIndicator.style.background =  `conic-gradient(#2d8ff9 0% ${event.target.value}%, lightgray 0% 100%)`;
+
+        });
+      
 
     window.addEventListener('beforeunload', () => {
         socket.disconnect();
@@ -56,14 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    function sendData() {
-        const dataToSend = {
-            message: "Hello from the client!",
-            number: Math.floor(Math.random() * 100) // Example of sending a random number
-        };
-        socket.emit("client_data", dataToSend);
-        console.log("Data sent to server:", dataToSend);
-    }
+    
 
     function getTempPercentage(currentTemp) {
         // Calculate the percentage of the current temperature relative to the max temperature
@@ -102,6 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
         maxBar.style.height = getTempPercentage(max.textContent);
         min.textContent = Math.min(...temperatures);
         minBar.style.height = getTempPercentage(min.textContent);
+        
+        if(circleToggle.getAttribute("switchstate") === "off"){
+            circleInput.value = data.window;
+            circleIndicator.style.background =  `conic-gradient(#2d8ff9 0% ${data.window}%, lightgray 0% 100%)`;
+        }
         timeLabels.push(getCurrentTime());
         temperatures.push(data.temp);
     
@@ -120,3 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
 });
+
+function toggleManual(){
+    if(circleToggle.getAttribute("switchstate") === "on"){
+        circleToggle.setAttribute("switchstate","off");
+        circleInput.disabled = true;
+    }else{
+        circleToggle.setAttribute("switchstate","on");
+        circleInput.disabled = false;
+    }
+}

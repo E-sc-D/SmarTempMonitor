@@ -100,6 +100,7 @@ body > div:nth-child(2) {
 
 /* Circle styles with dynamic border */
 .circle {
+  border: 2px solid black;
   width: 120px; /* Circle diameter */
   height: 120px; /* Circle diameter */
   border-radius: 50%; /* Make it a circle */

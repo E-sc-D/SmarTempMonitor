@@ -42,9 +42,13 @@ def on_connect():
 def handle_disconnect():
     socketio.s
 
+@socketio.on("client_data")
+def client_data(data):
+    print(data["window"])
+
 def background_task():
     while True:
-        socketio.emit("temp_reading", {"temp": random.randint(10, 100)})
+        socketio.emit("temp_reading", {"temp": random.randint(10, 100), "window" : random.randint(0,100)})
         time.sleep(5)
 
 
