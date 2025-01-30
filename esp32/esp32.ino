@@ -92,11 +92,11 @@ void loop() {
       
       if (!client.connected()) {
         state = MQTT_NOT_CONNECTED;
+      } else {
+        dtostrf(temp, 3, 2, tempS);
+        client.publish("esp32/temperature", tempS);
+        delay(frequency);
       }
-
-      dtostrf(temp, 3, 2, tempS);
-      client.publish("esp32/temperature", tempS);
-      delay(frequency);
       break;
     
     default:
