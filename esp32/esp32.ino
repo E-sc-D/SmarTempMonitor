@@ -23,26 +23,35 @@ const int mqttPort = 1883;
 int greenLedStatus = LOW;
 int redLedStatus = LOW;
 int state = WIFI_NOT_CONNECTED;
+int frequency = 2000;
 float temp = 0.0;
 char tempS[5];
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  char message[length + 1];  // Array di caratteri per contenere il payload più il terminatore null '\0'
+  memcpy(message, payload, length);
+  message[length] = '\0';
+  frequency = atoi(message);
+}
+
 void setup() {
   Serial.begin(9600);
 
   WiFi.begin(ssid, password);
   client.setServer(mqttServer, mqttPort);
-  // Subscribe to a topic
-  client.subscribe("esp32/temperature");
+  client.setCallback(callback);
 
   pinMode(GREEN_LED, OUTPUT);
   pinMode(RED_LED, OUTPUT);
 }
 
 void loop() {
+  Serial.println(frequency);
   temp = ((analogRead(TEMP_SENS) / (float)ADC_RESOLUTION) * VOLTAGE_REF - 0.5) * 100.0;
+  setLed();
 
   switch (state)
   {
@@ -60,6 +69,8 @@ void loop() {
         Serial.println("Connecting to MQTT...");
         if (client.connect("ESP32Client")) {
           Serial.println("Connected to MQTT broker");
+          // Subscribe to a topic
+          client.subscribe("CU/frequency");
           state = OPERATING;
         } else {
           Serial.print("Failed with state ");
@@ -82,15 +93,18 @@ void loop() {
       if (!client.connected()) {
         state = MQTT_NOT_CONNECTED;
       }
+
       dtostrf(temp, 3, 2, tempS);
       client.publish("esp32/temperature", tempS);
-      delay(2000);
+      delay(frequency);
       break;
     
     default:
       break;
   }
+}
 
+void setLed() {
   digitalWrite(GREEN_LED, greenLedStatus);
   digitalWrite(RED_LED, redLedStatus);
 }
