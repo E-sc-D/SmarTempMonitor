@@ -1,6 +1,8 @@
 import time
 import eventlet
 import random
+import pyserial
+
 eventlet.monkey_patch()
 
 from stopwatch import Stopwatch
@@ -11,12 +13,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 import paho.mqtt.client as mqtt
 
+windowState = False
 timer = Stopwatch()
 fsm = TemperatureFSM(T1=30, T2=50, F1=2000, F2=500, DT=4)
 app = Flask(__name__)
 socketio = SocketIO(app)
 Scss(app)
-
+# Replace 'COM3' (Windows) or '/dev/ttyUSB0' (Linux/Mac) with your Arduino port
+arduino = serial.Serial(port='COM3', baudrate=9600, timeout=1)
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
@@ -26,6 +30,8 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     fsm.update(float(msg.payload.decode()), timer.resetElapsed())
     print(f"Message received: {msg.topic} -> {msg.payload.decode()}")
+    if windowState:
+        arduino.write(f"{fsm.window_percentage}\n".encode())  # Send data with newline
     socketio.emit("temp_reading", {"temp": msg.payload.decode(), 
         "window" : msg.payload.decode(), 
         "status" : fsm.get_state()})
@@ -42,11 +48,15 @@ def on_connect_web():
 
 @socketio.on("client_data")
 def client_data(data):
-    print(data["window"])
+    arduino.write(f"{data["window"]}\n".encode())  # Send data with newline
 
 @socketio.on("reset")
 def client_reset(data):
     fsm.resetState()
+
+@socketio.on("auto")
+def toggle_auto(data):
+    windowState = not windowState
 
 def background_task():
     broker = "192.168.1.5"

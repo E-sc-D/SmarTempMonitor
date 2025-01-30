@@ -142,7 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if(circleToggle.getAttribute("switchstate") === "off"){
             circleInput.value = data.window;
             circleIndicator.style.background =  `conic-gradient(#2d8ff9 0% ${data.window}%, lightgray 0% 100%)`;
-        }
+        } 
+          
         timeLabels.push(getCurrentTime());
         temperatures.push(data.temp);
     
