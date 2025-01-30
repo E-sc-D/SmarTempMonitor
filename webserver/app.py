@@ -3,7 +3,7 @@ import eventlet
 import random
 eventlet.monkey_patch()
 
-""" from stopwatch import Stopwatch """
+from stopwatch import Stopwatch
 from temperature_fsm import TemperatureFSM  
 from flask import Flask, render_template
 from flask_scss import Scss
@@ -11,7 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 import paho.mqtt.client as mqtt
 
-""" timer = Stopwatch() """
+timer = Stopwatch()
 fsm = TemperatureFSM(T1=30, T2=50, F1=2000, F2=500, DT=4)
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -24,11 +24,11 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("esp32/temperature")
 
 def on_message(client, userdata, msg):
-    fsm.update(float(msg.payload.decode()), 500)
+    fsm.update(float(msg.payload.decode()), timer.resetElapsed())
     print(f"Message received: {msg.topic} -> {msg.payload.decode()}")
     socketio.emit("temp_reading", {"temp": msg.payload.decode(), 
         "window" : msg.payload.decode(), 
-        "status" : 0})
+        "status" : fsm.get_state()})
     client.publish("CU/frequency", str(fsm.get_frequency()))
 
 @app.route("/")
@@ -38,7 +38,7 @@ def index():
 @socketio.on("connect") 
 def on_connect_web():
     print("Client connected")
-    """ timer.start() """
+    timer.start()
 
 @socketio.on("client_data")
 def client_data(data):

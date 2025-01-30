@@ -23,7 +23,7 @@ const int mqttPort = 1883;
 int greenLedStatus = LOW;
 int redLedStatus = LOW;
 int state = WIFI_NOT_CONNECTED;
-int frequency = 2000;
+int frequency = 0;
 float temp = 0.0;
 char tempS[5];
 

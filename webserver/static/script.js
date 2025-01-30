@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         text: 'Temperature (°C)'  // Y-axis label (temperature)
                     },
                     min: 0,
-                    max: 50,
+                    max: 70,
                     stepSize: 5 // Optional: set the minimum value for the y-axis
                 }
             }
