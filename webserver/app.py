@@ -46,7 +46,7 @@ def client_data(data):
 
 @socketio.on("reset")
 def client_reset(data):
-    print(data["btn"])
+    fsm.resetState()
 
 def background_task():
     broker = "192.168.1.5"

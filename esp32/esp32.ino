@@ -67,7 +67,7 @@ void loop() {
     case MQTT_NOT_CONNECTED:
       if (!client.connected()) {
         Serial.println("Connecting to MQTT...");
-        if (client.connect("ESP32Client")) {
+        if (client.connect("ESP32")) {
           Serial.println("Connected to MQTT broker");
           // Subscribe to a topic
           client.subscribe("CU/frequency");
