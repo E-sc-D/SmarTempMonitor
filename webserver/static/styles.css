@@ -155,14 +155,39 @@ body > div:nth-child(2) {
   height: 100%;
   border: none;
   border-radius: 5px;
-  background-color: #ff5722;
-  color: white;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-/* Hover effect for the subsection button */
-.subsection button:hover {
-  background-color: #e64a19;
-}/*# sourceMappingURL=styles.css.map */
+
+/* State 0: Normal */
+.state-0 {
+  background-color: gray;
+  color: white;
+}
+
+/* State 1: Green */
+.state-1 {
+  background-color: green;
+  color: white;
+}
+
+/* State 2: Yellow */
+.state-2 {
+  background-color: yellow;
+  color: black;
+}
+
+/* State 3: Red + Blinking */
+.state-3 {
+  background-color: red;
+  color: white;
+  animation: blink 1s infinite alternate;
+}
+
+/* Blink Animation */
+@keyframes blink {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}

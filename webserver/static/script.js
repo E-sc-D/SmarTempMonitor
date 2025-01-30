@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     circleToggle = document.querySelector(".circle button");
     circleIndicator = document.querySelector(".circle");
     circleInput = document.querySelector(".circle input");
+    resetButton = document.querySelector(".subsection button");
 
     circleInput.addEventListener("change", function (event) {
             socket.emit("client_data", {"window": event.target.value});
@@ -35,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
       
+    resetButton.addEventListener("click",() =>{
+            socket.emit("reset",{"btn": 0});
+    });
 
     window.addEventListener('beforeunload', () => {
         socket.disconnect();
@@ -82,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     
-
     function getTempPercentage(currentTemp) {
         // Calculate the percentage of the current temperature relative to the max temperature
         let percentage = (currentTemp / tempLimit) * 100;
@@ -109,6 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${minutes}:${seconds}`;
     }
 
+    function changeButtonState(status) {
+    
+        // Remove any existing state classes
+        resetButton.classList.remove("state-0", "state-1", "state-2", "state-3");
+    
+        // Add the new state class
+        resetButton.classList.add(`state-${status}`);
+    }
+
     // Listen for data from the server
     socket.on("temp_reading", (data) => {
         
@@ -120,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         maxBar.style.height = getTempPercentage(max.textContent);
         min.textContent = Math.min(...temperatures);
         minBar.style.height = getTempPercentage(min.textContent);
-        
+        changeButtonState(data.status);
         if(circleToggle.getAttribute("switchstate") === "off"){
             circleInput.value = data.window;
             circleIndicator.style.background =  `conic-gradient(#2d8ff9 0% ${data.window}%, lightgray 0% 100%)`;
