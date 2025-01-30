@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
             animation: false,
             responsive: true,
             maintainAspectRatio: false,
+            animation: false,
             scales: {
                 x: {
                     title: {
@@ -78,8 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         display: true,
                         text: 'Temperature (°C)'  // Y-axis label (temperature)
                     },
-                    min: 0, 
-                    max: 100,
+                    min: 0,
+                    max: 50,
                     stepSize: 5 // Optional: set the minimum value for the y-axis
                 }
             }
@@ -127,7 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
         
         value.textContent = data.temp;
         valueBar.style.height = getTempPercentage(data.temp)
-        avg.textContent = `${ Math.round((temperatures.reduce((acc, curr) => acc + curr, 0))/temperatures.length)}`;
+        let media = 0;
+        for (let i = 0; i < temperatures.length; i++) {
+            media += Math.round(temperatures[i]);
+        }
+        avg.textContent = `${ (media/temperatures.length).toFixed(2) }`;
         avgBar.style.height = getTempPercentage(avg.textContent);
         max.textContent = Math.max(...temperatures);
         maxBar.style.height = getTempPercentage(max.textContent);

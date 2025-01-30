@@ -84,7 +84,7 @@ void loop() {
       }
       dtostrf(temp, 3, 2, tempS);
       client.publish("esp32/temperature", tempS);
-      delay(500);
+      delay(2000);
       break;
     
     default:

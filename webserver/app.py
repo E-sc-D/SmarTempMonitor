@@ -22,22 +22,16 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     print(f"Message received: {msg.topic} -> {msg.payload.decode()}")
-
-""" broker = "192.168.1.5"
-port = 1883
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(broker, port, 60)
-client.loop_forever() """
-
+    socketio.emit("temp_reading", {"temp": msg.payload.decode(), 
+        "window" : msg.payload.decode(), 
+        "status" : 0})
 
 @app.route("/")
 def index():
    return render_template("index.html")
 
 @socketio.on("connect") 
-def on_connect():
+def on_connect_web():
     print("Client connected")
 
 @socketio.on("client_data")
@@ -49,12 +43,14 @@ def client_reset(data):
     print(data["btn"])
 
 def background_task():
-    while True:
-        socketio.emit("temp_reading", {"temp": random.randint(10, 100), 
-        "window" : random.randint(0,100), 
-        "status" : 0})
-        time.sleep(0.5)
-        #fsm.update(temp, elapsed_time)
+    broker = "192.168.1.5"
+    port = 1883
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(broker, port, 60)
+    client.loop_forever()
+    #fsm.update(temp, elapsed_time)
 
 
 if __name__ in "__main__":
