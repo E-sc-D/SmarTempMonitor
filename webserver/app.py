@@ -53,7 +53,7 @@ def background_task():
         socketio.emit("temp_reading", {"temp": random.randint(10, 100), 
         "window" : random.randint(0,100), 
         "status" : 0})
-        time.sleep(5)
+        time.sleep(0.5)
         #fsm.update(temp, elapsed_time)
 
 

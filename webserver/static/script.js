@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }]
         },
         options: {
+            animation: false,
             responsive: true,
             maintainAspectRatio: false,
             scales: {

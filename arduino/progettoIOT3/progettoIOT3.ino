@@ -33,20 +33,6 @@ void loop() {
     mode = mode * -1;
   }
   
-  switch (choice) {
-        case 1:
-            printf("Hello, world!\n");
-            break;
-        case 2:
-            printf("Goodbye, world!\n");
-            break;
-        case 3:
-            printf("Exiting the program. Goodbye!\n");
-            break;
-        default:
-            printf("Invalid choice. Please select 1, 2, or 3.\n");
-            break;
-    }
     
   if(mode == 1){
     myServo.write((maxAngle/1020.0)*analogRead(potPin));
