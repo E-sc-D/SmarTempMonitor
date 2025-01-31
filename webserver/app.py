@@ -1,7 +1,7 @@
 import time
 import eventlet
 import random
-import pyserial
+import serial
 
 eventlet.monkey_patch()
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 Scss(app)
 # Replace 'COM3' (Windows) or '/dev/ttyUSB0' (Linux/Mac) with your Arduino port
-arduino = serial.Serial(port='COM3', baudrate=9600, timeout=1)
+arduino = serial.Serial(port='COM6', baudrate=9600, timeout=1)
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
