@@ -19,8 +19,13 @@ fsm = TemperatureFSM(T1=30, T2=50, F1=2000, F2=500, DT=4)
 app = Flask(__name__)
 socketio = SocketIO(app)
 Scss(app)
-# Replace 'COM3' (Windows) or '/dev/ttyUSB0' (Linux/Mac) with your Arduino port
-arduino = serial.Serial(port='COM6', baudrate=9600, timeout=1)
+arduino = None
+
+def arduino_send(valore):
+    global arduino
+    if arduino is not None:
+        arduino.write(f"{valore}".encode())  # Send data with newline
+        print(f"Valore inviato: {valore}")
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
@@ -28,14 +33,16 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("esp32/temperature")
 
 def on_message(client, userdata, msg):
+    global windowState
     fsm.update(float(msg.payload.decode()), timer.resetElapsed())
     print(f"Message received: {msg.topic} -> {msg.payload.decode()}")
-    if windowState:
-        arduino.write(f"{fsm.window_percentage}\n".encode())  # Send data with newline
     socketio.emit("temp_reading", {"temp": msg.payload.decode(), 
         "window" : msg.payload.decode(), 
         "status" : fsm.get_state()})
     client.publish("CU/frequency", str(fsm.get_frequency()))
+    if windowState:
+        valore = fsm.window_percentage
+        arduino_send(valore)
 
 @app.route("/")
 def index():
@@ -43,12 +50,15 @@ def index():
 
 @socketio.on("connect") 
 def on_connect_web():
+    global arduino
     print("Client connected")
     timer.start()
+    arduino = serial.Serial(port='COM6', baudrate=9600, timeout=1)
 
 @socketio.on("client_data")
 def client_data(data):
-    arduino.write(f"{data["window"]}\n".encode())  # Send data with newline
+    valore = data["window"]
+    arduino_send(valore)
 
 @socketio.on("reset")
 def client_reset(data):
@@ -56,6 +66,7 @@ def client_reset(data):
 
 @socketio.on("auto")
 def toggle_auto(data):
+    global windowState
     windowState = not windowState
 
 def background_task():

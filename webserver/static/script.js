@@ -167,8 +167,10 @@ function toggleManual(){
     if(circleToggle.getAttribute("switchstate") === "on"){
         circleToggle.setAttribute("switchstate","off");
         circleInput.disabled = true;
-    }else{
+    } else{
         circleToggle.setAttribute("switchstate","on");
         circleInput.disabled = false;
     }
+    
+    socket.emit("auto", {});
 }

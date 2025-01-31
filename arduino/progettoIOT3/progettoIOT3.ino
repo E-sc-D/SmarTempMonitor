@@ -37,17 +37,18 @@ void loop() {
   if(mode == 1){
     myServo.write((maxAngle/1020.0)*analogRead(potPin));
    
-  } else if(Serial.available() > 0 /* && ((millis() - timeStamp) > serialDelay) */ ){
+  } else if(Serial.available() /* && ((millis() - timeStamp) > serialDelay) */ ){
     //timeStamp = millis();
-    myServo.write(LimitNum(maxAngle,Serial.parseInt()));
-    
+    int angle = Serial.parseInt();
+    myServo.write(LimitNum(maxAngle, angle));
+    delay(500);
   }
 
   prevBtn = currentBtn;
 }
 
 int LimitNum(int limit, int value){
-  if(value > limit){
+  if(value >= limit){
     return limit;
   }
   return value;
