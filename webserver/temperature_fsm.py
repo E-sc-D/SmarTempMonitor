@@ -1,4 +1,6 @@
 # temperature_fsm.py
+import math
+
 class TemperatureFSM:
     def __init__(self, T1, T2, F1, F2, DT):
         self.T1 = T1
@@ -7,7 +9,7 @@ class TemperatureFSM:
         self.F2 = F2
         self.DT = DT
         self.state = 0
-        self.window_percentage = 0.0
+        self.window_percentage = 0
         self.time_in_too_hot = 0
 
     def update(self, T, elapsed_time):
@@ -15,18 +17,19 @@ class TemperatureFSM:
             case 0:
                 if T >= self.T1:
                     self.state = 1
-                    self.window_percentage = 0.01
 
             case 1:
                 if T < self.T1:
                     self.state = 0
-                    self.window_percentage = 0.0
+                    self.window_percentage = 0
                 elif T > self.T2:
                     self.state = 2
-                    self.window_percentage = 1.0
+                    self.window_percentage = 100
                     self.time_in_too_hot = 0
                 else:
-                    self.window_percentage = (T - self.T1) / (self.T2 - self.T1)
+                    self.window_percentage = math.clamp(
+                            math.round(((T - self.T1) / (self.T2 - self.T1)*100 ),0),
+                        1,100)
 
             case 2:
                 if T <= self.T2:

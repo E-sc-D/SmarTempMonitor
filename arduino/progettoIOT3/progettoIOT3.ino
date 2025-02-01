@@ -1,5 +1,8 @@
 #include<Servo.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // 0x27 is a common address for many I2C LCDs
 Servo myServo;
 
 const int servoPin = 3;
@@ -9,9 +12,16 @@ const double maxAngle = 90.0;
 int prevBtn = 0;
 int currentBtn = 0;
 int mode = -1;
-int serialAngle = 0;
-/* const long serialDelay = 500;
-long timeStamp = 0; */
+
+int reqWindow = 0;
+int temp = 0;
+
+const int BUFFER_SIZE = 50; // Define max buffer size
+char serialData[BUFFER_SIZE]; // Buffer to store incoming data
+int index = 0;
+
+const long delay = 700;
+long timeStamp = 0;
 
 //if you use the serial monitor to send the numerical value, be sure to select no line ending,since the terminator
 //is considered a char and Serial available will be on for 2 times, and the second time an integer is read, it will return 0
@@ -22,7 +32,9 @@ void setup() {
   pinMode(potPin,INPUT);
   pinMode(servoPin,OUTPUT);
   myServo.attach(servoPin);
-  
+  lcd.begin(16, 2);    // Set the LCD dimensions (16 columns, 2 rows)
+  lcd.backlight();  
+  timeStamp=millis();
 }
 
 void loop() {
@@ -31,25 +43,70 @@ void loop() {
 
   if(prevBtn == 1 && currentBtn == 0){
     mode = mode * -1;
+    if(millis() - timeStamp > delay ) {
+      timeStamp = millis();
+      lcd.setCursor(0, 0); // Set the cursor to the first column, second row
+      lcd.print("          ");
+      lcd.setCursor(0,0);
+      if(mode == -1){
+        lcd.print("Automatic"); // Print a message on the second row
+      } else {
+        lcd.print("Manual");
+      } 
+    }
   }
-  
+
+  if (Serial.available()) {
+        // Read incoming serial data
+        Serial.readBytesUntil('\n', serialData, BUFFER_SIZE - 1);
+        serialData[strlen(serialData)] = '\0';  // Null-terminate
+
+        // Use strtok() to split "variable:value"
+        char *varName = strtok(serialData, ":");
+        char *valueStr = strtok(NULL, ":");
+
+        if (varName != NULL && valueStr != NULL) {
+            if (strcmp(varName, "temp") == 0) {
+                temp = atoi(valueStr);
+                Serial.printf("temp received %d",temp);
+            } else if (strcmp(varName, "window") == 0) {
+                reqWindow = atoi(valueStr);
+                Serial.printf("window received %d",reqWindow);
+            } else {
+                Serial.println("Unknown variable");
+                Serial.println(serialData);
+            }
+        } else {
+            Serial.println("Invalid format!");
+        }
+    }
     
   if(mode == 1){
     myServo.write((maxAngle/1020.0)*analogRead(potPin));
+     if(millis() - timeStamp > delay ) {
+      timeStamp = millis();
+      lcd.setCursor(0, 1); // Set the cursor to the first column, second row
+      lcd.print("      ");
+      lcd.setCursor(0,1);
+      lcd.print(temp);
+      lcd.print("°C")
+    }
    
-  } else if(Serial.available() /* && ((millis() - timeStamp) > serialDelay) */ ){
-    //timeStamp = millis();
-    int angle = Serial.parseInt();
-    myServo.write(LimitNum(maxAngle, angle));
+  } else {
+    int angle = (int)(maxAngle/100)*(reqWindow);
+    myServo.write(LimitNum(maxAngle,0,angle));
     delay(500);
   }
 
   prevBtn = currentBtn;
 }
 
-int LimitNum(int limit, int value){
-  if(value >= limit){
-    return limit;
+int LimitNum(int uplimit,int lowlimit, int value){
+  if(value >= uplimit){
+    return uplimit;
+  }
+  if(value <= lowlimit){
+    return lowlimit
   }
   return value;
 }

@@ -24,7 +24,7 @@ arduino = None
 def arduino_send(valore):
     global arduino
     if arduino is not None:
-        arduino.write(f"{valore}".encode())  # Send data with newline
+        arduino.write(f"{valore}\n".encode())  # Send data with newline
         print(f"Valore inviato: {valore}")
 
 def on_connect(client, userdata, flags, rc):
@@ -40,9 +40,9 @@ def on_message(client, userdata, msg):
         "window" : msg.payload.decode(), 
         "status" : fsm.get_state()})
     client.publish("CU/frequency", str(fsm.get_frequency()))
+    arduino_send(f'temp:{msg.payload.decode()}')
     if windowState:
-        valore = fsm.window_percentage
-        arduino_send(valore)
+        arduino_send(f'window:{fsm.window_percentage}')
 
 @app.route("/")
 def index():
@@ -57,8 +57,7 @@ def on_connect_web():
 
 @socketio.on("client_data")
 def client_data(data):
-    valore = data["window"]
-    arduino_send(valore)
+    arduino_send(f'window:{data["window"]}')
 
 @socketio.on("reset")
 def client_reset(data):
