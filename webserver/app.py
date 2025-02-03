@@ -24,7 +24,7 @@ arduino = None
 def arduino_send(valore):
     global arduino
     if arduino is not None:
-        arduino.write(f"{valore}\n".encode())  # Send data with newline
+        arduino.write(valore.encode())  # Send data with newline
         print(f"Valore inviato: {valore}")
 
 #when is connected via mqtt to esp
@@ -43,9 +43,9 @@ def on_message(client, userdata, msg):
         "window" : msg.payload.decode(), 
         "status" : fsm.get_state()})
     client.publish("CU/frequency", str(fsm.get_frequency()))
-    arduino_send(f'temp:{msg.payload.decode()}')
+    arduino_send(f"temp:{msg.payload.decode()}\0")
     if windowIsAuto:
-        arduino_send(f'window:{fsm.window_percentage}')
+        arduino_send(f"win:{fsm.window_percentage}\0")
 
 @app.route("/")
 def index():
@@ -61,7 +61,7 @@ def on_webClient_connect():
 
 @socketio.on("client_data")
 def on_webClient_data(data):
-    arduino_send(f'window:{data["window"]}')
+    arduino_send(f"win:{data["window"]}\0")
 
 @socketio.on("reset")
 def on_webClient_reset(data):

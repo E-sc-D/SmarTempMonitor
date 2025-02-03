@@ -1,4 +1,4 @@
-#include<Servo.h>
+#include <Servo.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -14,13 +14,13 @@ int currentBtn = 0;
 int mode = -1;
 
 int reqWindow = 0;
-int temp = 0;
+double temp = 0.0;
 
 const int BUFFER_SIZE = 50; // Define max buffer size
 char serialData[BUFFER_SIZE]; // Buffer to store incoming data
 int index = 0;
 
-const long delay = 700;
+const long delayTime = 700;
 long timeStamp = 0;
 
 //if you use the serial monitor to send the numerical value, be sure to select no line ending,since the terminator
@@ -32,8 +32,8 @@ void setup() {
   pinMode(potPin,INPUT);
   pinMode(servoPin,OUTPUT);
   myServo.attach(servoPin);
-  lcd.begin(16, 2);    // Set the LCD dimensions (16 columns, 2 rows)
-  lcd.backlight();  
+  lcd.init();    // Set the LCD dimensions (16 columns, 2 rows)
+  resetScreen(); 
   timeStamp=millis();
 }
 
@@ -43,59 +43,57 @@ void loop() {
 
   if(prevBtn == 1 && currentBtn == 0){
     mode = mode * -1;
-    if(millis() - timeStamp > delay ) {
-      timeStamp = millis();
-      lcd.setCursor(0, 0); // Set the cursor to the first column, second row
-      lcd.print("          ");
-      lcd.setCursor(0,0);
-      if(mode == -1){
-        lcd.print("Automatic"); // Print a message on the second row
-      } else {
-        lcd.print("Manual");
-      } 
-    }
   }
 
   if (Serial.available()) {
-        // Read incoming serial data
-        Serial.readBytesUntil('\n', serialData, BUFFER_SIZE - 1);
-        serialData[strlen(serialData)] = '\0';  // Null-terminate
+    // Read incoming serial data
+    Serial.readBytesUntil('\n', serialData, BUFFER_SIZE - 1);
+    serialData[strlen(serialData)] = '\0';  // Null-terminate
 
-        // Use strtok() to split "variable:value"
-        char *varName = strtok(serialData, ":");
-        char *valueStr = strtok(NULL, ":");
+    // Use strtok() to split "variable:value"
+    char *varName = strtok(serialData, ":");
+    char *valueStr = strtok(NULL, ":");
 
-        if (varName != NULL && valueStr != NULL) {
-            if (strcmp(varName, "temp") == 0) {
-                temp = atoi(valueStr);
-                Serial.printf("temp received %d",temp);
-            } else if (strcmp(varName, "window") == 0) {
-                reqWindow = atoi(valueStr);
-                Serial.printf("window received %d",reqWindow);
-            } else {
-                Serial.println("Unknown variable");
-                Serial.println(serialData);
-            }
+    if (varName != NULL && valueStr != NULL) {
+        if (strcmp(varName, "temp") == 0) {
+            temp = atof(valueStr);
+            Serial.println("temp received: ");
+            Serial.println(temp);
+        } else if (strcmp(varName, "win") == 0) {
+            reqWindow = atoi(valueStr);
+            Serial.println("window received: ");
+            Serial.println(reqWindow);
         } else {
-            Serial.println("Invalid format!");
+            Serial.println("Unknown variable");
+            Serial.println(serialData);
         }
+    } else {
+        Serial.println("Invalid format!");
     }
+  }
     
   if(mode == 1){
     myServo.write((maxAngle/1020.0)*analogRead(potPin));
-     if(millis() - timeStamp > delay ) {
+
+    if(millis() - timeStamp > delayTime ) {
       timeStamp = millis();
-      lcd.setCursor(0, 1); // Set the cursor to the first column, second row
-      lcd.print("      ");
-      lcd.setCursor(0,1);
-      lcd.print(temp);
-      lcd.print("°C")
+      resetScreen();
+      lcd.setCursor(0, 0);
+      lcd.print("Manual");
+      lcd.setCursor(0, 1);
+      lcd.print(reqWindow);
+      lcd.print(" Celsius");
     }
-   
   } else {
-    int angle = (int)(maxAngle/100)*(reqWindow);
+    int angle = (int)((maxAngle/100.0)*(reqWindow));
     myServo.write(LimitNum(maxAngle,0,angle));
-    delay(500);
+
+    if(millis() - timeStamp > delayTime ) {
+      timeStamp = millis();
+      resetScreen();
+      lcd.setCursor(0, 0);
+      lcd.print("Automatic");
+    }
   }
 
   prevBtn = currentBtn;
@@ -106,7 +104,13 @@ int LimitNum(int uplimit,int lowlimit, int value){
     return uplimit;
   }
   if(value <= lowlimit){
-    return lowlimit
+    return lowlimit;
   }
   return value;
+}
+
+//reset dello schermo
+void resetScreen() {
+    lcd.backlight();
+    lcd.clear();
 }
