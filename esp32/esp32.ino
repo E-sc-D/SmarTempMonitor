@@ -59,12 +59,20 @@ void loop() {
       if (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.println("Connecting to WiFi...");
+        if (redLedStatus == LOW) {
+            redLedStatus = HIGH;
+            greenLedStatus = LOW;
+        }
       } else {
         Serial.println("Connected to WiFi");
         state = MQTT_NOT_CONNECTED;
       }
       break;
     case MQTT_NOT_CONNECTED:
+      if (WiFi.status() != WL_CONNECTED) {
+        state = WIFI_NOT_CONNECTED;
+      }
+
       if (!client.connected()) {
         Serial.println("Connecting to MQTT...");
         if (client.connect("ESP32")) {
@@ -88,6 +96,10 @@ void loop() {
       if (greenLedStatus == LOW) {
         greenLedStatus = HIGH;
         redLedStatus = LOW;
+      }
+
+      if (WiFi.status() != WL_CONNECTED) {
+        state = WIFI_NOT_CONNECTED;
       }
       
       if (!client.connected()) {
