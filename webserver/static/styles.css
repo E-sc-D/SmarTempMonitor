@@ -160,29 +160,28 @@ body > div:nth-child(2) {
   transition: background-color 0.3s;
 }
 
-
 /* State 0: Normal */
 .state-0 {
-  background-color: gray;
-  color: white;
+  background-color: white;
+  color: black;
 }
 
 /* State 1: Green */
 .state-1 {
-  background-color: green;
-  color: white;
+  background-color: yellow;
+  color: black;
 }
 
 /* State 2: Yellow */
 .state-2 {
-  background-color: yellow;
+  background-color: orange;
   color: black;
 }
 
 /* State 3: Red + Blinking */
 .state-3 {
   background-color: red;
-  color: white;
+  color: black;
   animation: blink 1s infinite alternate;
 }
 

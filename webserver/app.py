@@ -15,7 +15,7 @@ import paho.mqtt.client as mqtt
 
 windowIsAuto = False
 timer = Stopwatch()
-fsm = TemperatureFSM(T1=10, T2=30, F1=2000, F2=500, DT=4)
+fsm = TemperatureFSM(T1=20, T2=30, F1=5000, F2=2000, DT=4)
 app = Flask(__name__)
 socketio = SocketIO(app)
 Scss(app)
