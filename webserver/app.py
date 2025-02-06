@@ -20,6 +20,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 Scss(app)
 arduino = None
+client = None
 
 def arduino_send(valore):
     global arduino
@@ -29,9 +30,10 @@ def arduino_send(valore):
 
 #when is connected via mqtt to esp
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
-    # Subscribe to a topic
-    client.subscribe("esp32/temperature")
+    if rc == 0:
+        print("Connected with result code " + str(rc))
+        # Subscribe to a topic
+        client.subscribe("esp32/temperature")
 
 #when receiving a message by esp32, mqtt
 def on_message(client, userdata, msg):
@@ -42,8 +44,13 @@ def on_message(client, userdata, msg):
     socketio.emit("temp_reading", {"temp": msg.payload.decode(), 
         "window" : msg.payload.decode(), 
         "status" : fsm.get_state()})
-    client.publish("CU/frequency", str(fsm.get_frequency()))
+        
+    if fsm.is_frequency_sent() == 0:
+        client.publish("CU/frequency", str(fsm.get_frequency()))
+        fsm.frequency_sent = 1
+
     arduino_send(f"temp:{msg.payload.decode()}\0")
+
     if windowIsAuto:
         arduino_send(f"win:{fsm.window_percentage}\0")
 
@@ -57,6 +64,7 @@ def on_webClient_connect():
     
     print("Client connected")
     timer.start()
+    connect_mqtt()
     arduino = serial.Serial(port='COM6', baudrate=9600, timeout=1)
 
 @socketio.on("client_data")
@@ -72,16 +80,31 @@ def on_webClient_windowModeToggle(data):
     global windowIsAuto
     windowIsAuto = not windowIsAuto
 
-def background_task(): #Questo potrebbe non essere necessario usando client_start
-    broker = "192.168.1.5"
-    port = 1883
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(broker, port, 60)
-    client.loop_forever()
+def connect_mqtt():
+    global client
 
-if __name__ in "__main__":
-    socketio.start_background_task(background_task)
-    socketio.run(app, debug=True)
+    # Controlla se il client MQTT è già connesso
+    if client is None or not client.is_connected():
+        print("Connessione MQTT...")
+        broker = "192.168.1.5"
+        port = 1883
+        client = mqtt.Client(client_id="CU_01")
+        client.on_connect = on_connect
+        client.on_message = on_message
+        client.connect(broker, port, 60)
 
+        # Inizia il ciclo di gestione dei messaggi MQTT in background
+        client.loop_start()
+    else:
+        print("Connessione MQTT già attiva.")
+
+@socketio.event
+def disconnect():
+    print("Disconnesso da SocketIO")
+
+    # Disconnessione MQTT se necessario
+    if client:
+        client.disconnect()
+        client.loop_stop()
+
+socketio.run(app, debug=True)

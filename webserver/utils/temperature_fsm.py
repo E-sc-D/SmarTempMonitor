@@ -11,21 +11,25 @@ class TemperatureFSM:
         self.state = 0
         self.window_percentage = 0
         self.time_in_too_hot = 0
+        self.frequency_sent = 0
 
     def update(self, T, elapsed_time):
         match self.state:
             case 0:
                 if T >= self.T1:
                     self.state = 1
+                    self.frequency_sent = 0
 
             case 1:
                 if T < self.T1:
                     self.state = 0
                     self.window_percentage = 0
+                    self.frequency_sent = 0
                 elif T > self.T2:
                     self.state = 2
                     self.window_percentage = 100
                     self.time_in_too_hot = 0
+                    self.frequency_sent = 0
                 else:
                     self.window_percentage = math.clamp(
                             math.round(((T - self.T1) / (self.T2 - self.T1)*100 ),0),
@@ -34,10 +38,12 @@ class TemperatureFSM:
             case 2:
                 if T <= self.T2:
                     self.state = 1
+                    self.frequency_sent = 0
                 else:
                     self.time_in_too_hot += elapsed_time
                     if self.time_in_too_hot >= self.DT:
                         self.state = 3
+                        self.frequency_sent = 0
 
             case 3:
                 pass
@@ -51,6 +57,11 @@ class TemperatureFSM:
         else:
             return self.F2
 
+    def is_frequency_sent(self):
+        return self.frequency_sent
+
     def resetState(self):
         self.state = 0
+
+
         
