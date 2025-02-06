@@ -12,6 +12,7 @@ const double maxAngle = 90.0;
 int prevBtn = 0;
 int currentBtn = 0;
 int mode = -1;
+int prevMode = -1;
 
 int reqWindow = 0;
 double temp = 0.0;
@@ -38,11 +39,15 @@ void setup() {
 }
 
 void loop() {
-  delay(100);
   currentBtn = digitalRead(btnPin);
 
   if(prevBtn == 1 && currentBtn == 0){
     mode = mode * -1;
+  }
+
+  if (prevMode != mode) {
+    Serial.print("mode:");
+    Serial.println(mode);
   }
 
   if (Serial.available()) {
@@ -57,12 +62,12 @@ void loop() {
     if (varName != NULL && valueStr != NULL) {
         if (strcmp(varName, "temp") == 0) {
             temp = atof(valueStr);
-            Serial.println("temp received: ");
-            Serial.println(temp);
+            //Serial.println("temp received: ");
+            //Serial.println(temp);
         } else if (strcmp(varName, "win") == 0) {
             reqWindow = atoi(valueStr);
-            Serial.println("window received: ");
-            Serial.println(reqWindow);
+            //Serial.println("window received: ");
+            //Serial.println(reqWindow);
         } else {
             Serial.println("Unknown variable");
             Serial.println(serialData);
@@ -97,6 +102,7 @@ void loop() {
   }
 
   prevBtn = currentBtn;
+  prevMode = mode;
 }
 
 int LimitNum(int uplimit,int lowlimit, int value){

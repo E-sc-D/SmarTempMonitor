@@ -15,12 +15,13 @@ import paho.mqtt.client as mqtt
 
 windowIsAuto = False
 timer = Stopwatch()
-fsm = TemperatureFSM(T1=30, T2=50, F1=2000, F2=500, DT=4)
+fsm = TemperatureFSM(T1=10, T2=30, F1=2000, F2=500, DT=4)
 app = Flask(__name__)
 socketio = SocketIO(app)
 Scss(app)
 arduino = None
 client = None
+arduino_mode = "mode:-1"
 
 def arduino_send(valore):
     global arduino
@@ -37,21 +38,26 @@ def on_connect(client, userdata, flags, rc):
 
 #when receiving a message by esp32, mqtt
 def on_message(client, userdata, msg):
-    global windowIsAuto,timer
+    global windowIsAuto, timer, arduino_mode
+
+    line = arduino.readline().decode('utf-8').strip()
+    if line.startswith("mode:"):
+        arduino_mode = line
 
     fsm.update(float(msg.payload.decode()), timer.resetElapsed())
     print(f"Message received: {msg.topic} -> {msg.payload.decode()}")
     socketio.emit("temp_reading", {"temp": msg.payload.decode(), 
-        "window" : msg.payload.decode(), 
+        "window" : fsm.window_percentage, 
         "status" : fsm.get_state()})
         
     if fsm.is_frequency_sent() == 0:
         client.publish("CU/frequency", str(fsm.get_frequency()))
         fsm.frequency_sent = 1
 
-    arduino_send(f"temp:{msg.payload.decode()}\0")
+    if arduino_mode == "mode:1":
+        arduino_send(f"temp:{msg.payload.decode()}\0")
 
-    if windowIsAuto:
+    if windowIsAuto and arduino_mode == "mode:-1":
         arduino_send(f"win:{fsm.window_percentage}\0")
 
 @app.route("/")

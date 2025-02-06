@@ -1,5 +1,4 @@
 # temperature_fsm.py
-import math
 
 class TemperatureFSM:
     def __init__(self, T1, T2, F1, F2, DT):
@@ -31,9 +30,7 @@ class TemperatureFSM:
                     self.time_in_too_hot = 0
                     self.frequency_sent = 0
                 else:
-                    self.window_percentage = math.clamp(
-                            math.round(((T - self.T1) / (self.T2 - self.T1)*100 ),0),
-                        1,100)
+                    self.window_percentage = round(((T - self.T1) / (self.T2 - self.T1) * 100) + 1, 0)
 
             case 2:
                 if T <= self.T2:
